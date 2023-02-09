@@ -16,7 +16,7 @@ export function PlayerLookUp(){
 
     const {isLoading, isError, data = []} = useQuery("playercache",() => (getPlayerByLastName(form)));
 
-
+    
     if(isLoading){
         return <p>LOADING</p>
     }
@@ -32,13 +32,13 @@ export function PlayerLookUp(){
         <fieldset>
             <legend>Get player by Last Name</legend>
 
-            <input type="text" placeholder="playerID" onChange={e=>setForm({...form, lname: e.target.value})}/>
+            <input type="text" placeholder="last name" onChange={e=>setForm({...form, lname: e.target.value})}/>
             
         </fieldset>
 
        
 
-        <div>{(data.length !== 0) ? data.map((p)=> <div> {p.fname} {p.lname} {p.bioMetrics.heightInches}</div>) : <div> </div> }</div>
+        <div>{(data.length !== 0) ? data.map((p)=> <div> {p.fname} {p.lname} </div>) : <div> </div> }</div>
     
     
     </>

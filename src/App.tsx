@@ -1,5 +1,6 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider} from 'react-query'
+import { CreatePlayerForm } from './components/addPlayer';
 import { PlayerLookUp } from './components/playerLookUp';
 import { PlayerViewer } from './components/showPlayers';
 import { UpdatePlayer } from './components/updatePlayer';
@@ -19,7 +20,7 @@ function App() {
     <PlayerViewer/>
     <UpdatePlayer/>
     <PlayerLookUp/>
-    
+    <CreatePlayerForm/>
 
   </QueryClientProvider>
   </>

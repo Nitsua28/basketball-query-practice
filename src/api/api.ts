@@ -35,6 +35,69 @@ export type LastNameForm = {
     lname: string
 }
 
+export type NewPlayerForm = {
+    fname: string
+    lname: string
+    heightInches: number
+    weightLbs: number
+}
+
+export async function addPlayer(newPlayer: NewPlayerForm):Promise<BasketballPlayer[]>{
+
+    const query = `mutation AddPlayer($playerInput: NewPlayerInput!){
+  
+        addPlayer(input:$playerInput){
+          playerId
+        }
+      }`
+    
+    const variables = {playerInput:newPlayer};
+    const requestBody: string = JSON.stringify({query,variables});
+    const httpResponse = await fetch("http://127.0.0.1:8000/graphql", {method:"POST", body:requestBody, headers:{'Content-Type':"application/json"}});
+    const responseBody = await httpResponse.json();
+    const playerInfo:{playerId:number} = responseBody;
+    const updateQuery = `mutation AddPlayer($Input: StatsInput!){
+  
+        mergeStats(input:$Input){
+          ...on BaksetballPlayer{
+            playerId
+            careerStats{
+              shotAttempts
+                  madeBaskets
+                  rebounds
+                  assists
+                  blocks
+            }
+          }
+          ...on PlayerDoesNotExist{
+      			playerId
+      			message
+    			}
+        
+      }
+    }`  
+
+    const updateVariables = {
+        input:
+        {
+            "Input": {
+            "playerId": playerInfo,
+            "shotAttempts": 0,
+                "madeBaskets": 0,
+            "rebounds": 0,
+            "assists": 0,
+            "blocks": 0
+            }
+        }
+    }
+
+    const request_Body: string = JSON.stringify({query: updateQuery,variables: updateVariables});
+    const http_Response = await fetch("http://127.0.0.1:8000/graphql", {method:"POST", body:request_Body, headers:{"Content-Type":"application/json"}});
+    const response_Body = await http_Response.json()
+    const player: BasketballPlayer[] = response_Body.data
+    return player
+
+}
 export async function getPlayerByLastName(form: LastNameForm):Promise<BasketballPlayer[]>{
         const query = `query PlayersByLname($lnameToSearch:String){
             players(lname:$lnameToSearch){
@@ -45,11 +108,13 @@ export async function getPlayerByLastName(form: LastNameForm):Promise<Basketball
                 }
             }
           }`
+        console.log(form)
         const variables = {lnameToSearch: form.lname}
         const body = JSON.stringify({query,variables})
         const httpResponse = await fetch("http://127.0.0.1:8000/graphql", {method:"POST", body, headers:{"Content-Type":"application/json"}});
         const responseBody = await httpResponse.json();
         const players:BasketballPlayer[] = responseBody.data.players;
+        console.log(players)
         return players
     }
 export async function getAllPlayers():Promise<BasketballPlayer[]>{
